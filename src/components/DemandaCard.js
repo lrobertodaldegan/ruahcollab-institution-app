@@ -1,95 +1,55 @@
+import {useState, useEffect} from 'react';
 import{
   StyleSheet,
   Dimensions,
-  View
+  View,
 } from 'react-native';
 import { 
   faCalendarDays, 
-  faPlaceOfWorship,
-  faLocationDot,
-  faLungs,
-  faPhone,
-  faEnvelope,
-  faCheckCircle,
-  faWind,
 } from '@fortawesome/free-solid-svg-icons'
 import Label from './Label';
-import Icon from './Icon';
 import DetalheDemandaLabel from './DetalheDemandaLabel';
 import Button from './Button';
+import { del } from '../service/Rest/RestService';
 
-const DemandaCard = ({item}) => {
+const DemandaCard = ({item, navigation, onDelete=()=>null}) => {
 
-  const getStatusComponent = () => {
-    if(item){
-      if(item.status === 'aceito'){
-        return (
-          <>
-            <View style={styles.statusWrap}>
-              <Icon icon={faCheckCircle} size={24} style={styles.statusIcon}/>
-              <Label value='VOCÊ FOI ACEITO!!!' style={styles.statusLbl}/>
-            </View>
-
-            <Label value='Entre em contato com a instituição ou aguarde entrarem em contato com você!' 
-                style={styles.statusLegend}/>
-          </>
-        );
-      }
-
-      if(item.status === 'pendente'){
-        return (
-          <>
-            <View style={styles.statusWrap}>
-              <Label value='Inscrição enviada...' style={styles.statusLbl}/>
-            </View>
-
-            <Label value='Sua inscrição foi enviada, mas ainda não foi aceita.' 
-                style={styles.statusLegend}/>
-          </>
-        );
-      }
-
-      return (
-        <>
-            <View style={styles.statusWrap}>
-              <Button label='RUAH' icon={faWind} style={styles.ruahBtn}
-                  labelStyle={styles.ruahBtnLbl} iconStyle={styles.ruahBtnIcon}/>
-            </View>
-
-            <Label value='Ao clicar no botão, enviaremos sua inscrição na demanda para a instituição.' 
-                style={styles.statusLegend}/>
-          </>
-      );
+  const getDemand = () => {
+    if(item.demand){
+      return item.demand;//item == subscription
+    } else {
+      return item;//item == demand
     }
+  }
+
+  const handleDelete = () => {
+    del(`/demand/${getDemand().id}`, () => navigation.navigate('error'))
+    .then(response => {
+      if(response.status === 200)
+        onDelete();
+    });
   }
 
   return (
     <View style={styles.wrap}>
-      <Label value={item.titulo} style={styles.title}/>
+      <Label value={getDemand().title} style={styles.title}/>
 
-      <Label value={item.descricao} style={styles.desc}/>
+      <Label value={getDemand().resume} style={styles.desc}/>
 
       <View style={styles.instituicaoWrap}>
-        <DetalheDemandaLabel label={item.recorrencia} 
+        <DetalheDemandaLabel label={getDemand().recurrence} 
             icon={faCalendarDays}/>
-
-        <DetalheDemandaLabel label={item.instituicao.nome} 
-            icon={faPlaceOfWorship}/>
-
-        <DetalheDemandaLabel label={item.instituicao.endereco} 
-            icon={faLocationDot}/>
-
-        <DetalheDemandaLabel label={`${item.instituicao.qtdDemandas} demanda(s) cadastrada(s)`} 
-            icon={faLungs}/>
-
-        <DetalheDemandaLabel label={item.instituicao.telefone} 
-            icon={faPhone}/>
-
-        <DetalheDemandaLabel label={item.instituicao.email} 
-            icon={faEnvelope}/>
       </View>
 
-     {getStatusComponent()}
+      <View style={styles.btnsWrap}>
+        <Button style={[styles.btn, styles.btnLight]} 
+            label={`Voluntários (${item.subscriptions})`}
+            labelStyle={styles.lightBtnLbl}
+            onPress={() => navigation.navigate('demanda', {demandId:getDemand().id})}/>
+
+        <Button style={[styles.btn]} label='Apagar demanda'
+            onPress={() => handleDelete()}/>
+      </View>
     </View>
   );
 }
@@ -99,7 +59,7 @@ const size = Dimensions.get('screen');
 const styles = StyleSheet.create({
   wrap:{
     width:size.width - 40,
-    minHeight: (size.height /2 ),
+    minHeight: (size.height / 4 ) - 20,
     backgroundColor:'#8A4A20',
     borderRadius:10,
     marginVertical:10,
@@ -114,43 +74,24 @@ const styles = StyleSheet.create({
   desc:{
     color:'#fafafa',
     marginVertical:5,
+
   },
   instituicaoWrap:{
     marginVertical:10
   },
-  statusWrap:{
-    flexDirection:"row",
-    alignItems:'center',
+  btnsWrap:{
+    flexDirection:'row'
+  },
+  btn:{
+    width: (size.width * 0.5) - 40,
     marginTop:20
   },
-  statusIcon:{
-    color:'#fafafa'
+  btnLight:{
+    backgroundColor:'#FCF3ED'
   },
-  statusLbl:{
-    color:'#fafafa',
-    fontFamily:'Montserrat-Bold',
-    fontSize:20,
-    marginLeft:10
-  },
-  statusLegend:{
-    color:'#fafafa',
-    fontSize:12,
-    marginTop:10,
-    textAlign:'center'
-  },
-  ruahBtn:{
-    backgroundColor:'#F8E3D6',
-    width:'95%'
-  },
-  ruahBtnIcon:{
+  lightBtnLbl:{
     color:'#8A4A20'
-  },
-  ruahBtnLbl:{
-    marginRight:10,
-    fontSize:20,
-    fontFamily:'Montserrat-Bold',
-    color:'#8A4A20'
-  },
+  }
 });
 
 export default DemandaCard;

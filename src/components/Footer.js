@@ -5,33 +5,33 @@ import {
   Dimensions,
 } from "react-native";
 import Icon from "./Icon";
-import { faWind, faSearch, faWarehouse } from '@fortawesome/free-solid-svg-icons'
+import { faWind, faLungs } from '@fortawesome/free-solid-svg-icons'
 
 
-const Footer = ({selected='home', navigation}) => {
+const Footer = ({selected='home', style={}, navigation}) => {
   return (
-    <View style={styles.footer}>
-      
-      <TouchableHighlight underlayColor='#fafafa'
-          onPress={() => navigation.navigate('pesquisa')}
-          style={[styles.footerIconWrap, selected === 'pesquisa'
-                                                  ? styles.footerIconWrapSelected 
-                                                  : {} ]}>
-
-        <Icon size={22} icon={faSearch} 
-            style={[styles.footerIcon, selected === 'pesquisa' 
-                                                  ? styles.footerIconSelected 
-                                                  : {}]} />
-      </TouchableHighlight>
+    <View style={[styles.footer,style]}>
 
       <TouchableHighlight underlayColor='#fafafa' 
-          onPress={() => navigation.navigate('inscricoes')}
-          style={[styles.footerIconWrap, selected === 'inscricoes'
+          onPress={() => navigation.navigate('voluntarios')}
+          style={[styles.footerIconWrap, selected === 'voluntarios'
                                                     ? styles.footerIconWrapSelected 
                                                     : {} ]}>
 
         <Icon size={22} icon={faWind} 
-            style={[styles.footerIcon, selected === 'inscricoes' 
+            style={[styles.footerIcon, selected === 'voluntarios' 
+                                                  ? styles.footerIconSelected 
+                                                  : {}]} />
+      </TouchableHighlight>
+
+      <TouchableHighlight underlayColor='#fafafa'
+          onPress={() => navigation.navigate('demandas')}
+          style={[styles.footerIconWrap, selected === 'demandas'
+                                                  ? styles.footerIconWrapSelected 
+                                                  : {} ]}>
+
+        <Icon size={22} icon={faLungs} 
+            style={[styles.footerIcon, selected === 'demandas' 
                                                   ? styles.footerIconSelected 
                                                   : {}]} />
       </TouchableHighlight>
