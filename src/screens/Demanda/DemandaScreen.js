@@ -53,7 +53,7 @@ const DemandaScreen = ({route, navigation}) => {
 
   const renderDemands = () => {
     if(loading){
-      return <Loader color='#8A4A20'/>
+      return <Loader />
     } else {
       if(demand && demand.subscriptions && demand.subscriptions.length > 0){
         return (
