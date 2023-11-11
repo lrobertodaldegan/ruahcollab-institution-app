@@ -3,7 +3,7 @@ import CacheService from '../Cache/CacheService';
 
 //const BASEURL = 'https://acaodoespirito.com.br/ruahcollab';
 //const BASEURL = 'http://10.0.2.2:21017/ruahcollab';
-const BASEURL = 'http://192.168.100.33:21017/ruahcollab';
+const BASEURL = 'http://192.168.100.27:21017/ruahcollab';
 
 const DEFAULT_HEADERS = {
   'X-Requested-With': 'XMLHttpRequest'

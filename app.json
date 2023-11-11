@@ -1,4 +1,7 @@
 {
-  "name": "ruahcollab",
-  "displayName": "ruahcollab"
+  "name": "ruahcollab-institution",
+  "displayName": "ruahcollab instituições",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-2420598559068720~2957107928"
+  }
 }

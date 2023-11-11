@@ -10,6 +10,7 @@ import {
 import Button from '../../components/Button';
 import Header from '../../components/Header';
 import Label from '../../components/Label';
+import ErrorLabel from '../../components/ErrorLabel';
 import Footer from '../../components/Footer';
 import {post} from '../../service/Rest/RestService';
 import { faCalendar, faCalendarDay, faCalendarDays, faCalendarWeek, faDiceOne, faDiceThree, faDiceTwo } from '@fortawesome/free-solid-svg-icons';
@@ -19,15 +20,29 @@ const NovaDemandaScreen = ({navigation}) => {
   const [title, setTitle] = useState(null);
   const [resume, setResume] = useState(null);
   const [recurrence, setRecurrence] = useState('Pontual');
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  const renderError = () => {
+    if(errorMsg && errorMsg !== null)
+      return <ErrorLabel value={errorMsg} style={styles.lblError}/>
+    else
+      return <></>
+  }
 
   const handleSubmit = () => {
-    let body = {title, resume, recurrence};
+    if(title && title != null && recurrence && recurrence != null){
+      setErrorMsg(null);
 
-    post('/demand', body, ()=>navigation.navigate('error'))
-    .then(response => {
-      if(response.status === 201)
-        navigation.navigate('demandas');
-    });
+      let body = {title, resume, recurrence};
+
+      post('/demand', body, ()=>navigation.navigate('error'))
+      .then(response => {
+        if(response.status === 201)
+          navigation.navigate('demandas');
+      });
+    } else {
+      setErrorMsg('Informe pelo menos um título e uma reccorência para cadastrar a demanda!');
+    }
   }
 
   const handleRecSelection = (val) => {
@@ -84,6 +99,8 @@ const NovaDemandaScreen = ({navigation}) => {
                 selected={recurrence === 'Anual'}
                 onPress={() => handleRecSelection('Anual')}/>
           </View>
+
+          {renderError()}
 
           <Button label='Salvar' onPress={() => handleSubmit()}
               style={{marginBottom:300}}/>

@@ -11,6 +11,7 @@ import Button from '../../components/Button';
 import Footer from '../../components/Footer';
 import Header from '../../components/Header';
 import Label from '../../components/Label';
+import ErrorLabel from '../../components/ErrorLabel';
 import {get, put} from '../../service/Rest/RestService';
 import CacheService from '../../service/Cache/CacheService';
 
@@ -25,6 +26,7 @@ const ProfileScreen = ({navigation}) => {
   const [site, setSite] = useState(null);
   const [endereco, setEndereco] = useState(null);
   const [zipcode, setZipcode] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
   const [btnLbl, setBtnLbl] = useState('Salvar');
 
   useEffect(() => {
@@ -46,25 +48,43 @@ const ProfileScreen = ({navigation}) => {
     }).catch(err => {console.log(err); navigation.navigate('error');});
   }, []);
 
+  const renderError = () => {
+    if(errorMsg && errorMsg !== null)
+      return <ErrorLabel value={errorMsg} style={styles.lblError}/>
+    else
+      return <></>
+  }
+
   const handleSubmit = async () => {
-    let body = {
-      name: nome,
-      phone: telefone,
-      site: site,
-      contactEmail: contactEmail,
-      contactPhone: telefone2,
-      resume: resumo,
-      zipcode: zipcode,
-      address: endereco
+    if(nome && nome != null
+            && email && email != null
+            && telefone && telefone != null
+            && resumo && resumo != null
+            && endereco && endereco != null){
+      
+      setErrorMsg(null);
+
+      let body = {
+        name: nome,
+        phone: telefone,
+        site: site,
+        contactEmail: contactEmail,
+        contactPhone: telefone2,
+        resume: resumo,
+        zipcode: zipcode,
+        address: endereco
+      }
+
+      if(senha && senha != null)
+        body.password = senha;
+
+      put('/user', body, () => navigation.navigate('login')).then(response => {
+        if(response.status == 200)
+          setBtnLbl('Salvo!');
+      }).catch(err => {console.log(err); navigation.navigate('error');});
+    } else {
+      setErrorMsg('Preencha todos os campos obrigatórios (*) para continuar!');
     }
-
-    if(senha && senha != null)
-      body.password = senha;
-
-    put('/user', body, () => navigation.navigate('login')).then(response => {
-      if(response.status == 200)
-        setBtnLbl('Salvo!');
-    }).catch(err => {console.log(err); navigation.navigate('error');});
   }
 
   const handleLogout = () => {
@@ -84,11 +104,11 @@ const ProfileScreen = ({navigation}) => {
           <Label value={`E-mail de acesso ao app:\n${email}`} style={styles.mailInfo}/>
 
           <TextInput style={styles.input} placeholderTextColor='#b57145'
-            placeholder='Nome da instituição'
+            placeholder='Nome da instituição*'
             value={nome} onChangeText={(val) => setNome(val)}/>
 
           <TextInput style={styles.input} placeholderTextColor='#b57145'
-              placeholder='Telefone pra contato (Ex.: 041995429288)'
+              placeholder='Telefone pra contato (Ex.: 041995429288)*'
               value={telefone} onChangeText={(val) => setTelefone(val)}/>
               
           <TextInput style={styles.input} placeholderTextColor='#b57145'
@@ -108,16 +128,18 @@ const ProfileScreen = ({navigation}) => {
               value={site} onChangeText={(val) => setSite(val)}/>
 
           <TextInput style={styles.txtArea} placeholderTextColor='#b57145'
-              placeholder='Nos conte sobre a instituição...' multiline={true}
+              placeholder='Nos conte sobre a instituição...*' multiline={true}
               value={resumo} onChangeText={(val) => setResumo(val)}/>
 
           <TextInput style={styles.input} placeholderTextColor='#b57145'
-              placeholder='Informe o endereço da instituição'
+              placeholder='Informe o endereço da instituição*'
               value={endereco} onChangeText={(val) => setEndereco(val)}/>
 
           <TextInput style={styles.input} placeholderTextColor='#b57145'
               placeholder='Informe o CEP da instituição (opcional)'
               value={zipcode} onChangeText={(val) => setZipcode(val)}/>
+
+          {renderError()}
 
           <Button label={btnLbl} onPress={() => handleSubmit()}/>
 

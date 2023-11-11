@@ -79,7 +79,7 @@ const VolunteerCard = ({item, showDemandLbls=true}) => {
         />
 
         <DetalheDemandaLabel icon={faScroll} 
-            label={`Sobre o voluntário:\n\n${item.voluntair.resume}`} 
+            label={`Sobre o voluntário:\n\n${item.voluntair.resume ? item.voluntair.resume : '' }`} 
         />
 
         <Button label={btnLbl} style={styles.ruahBtn}

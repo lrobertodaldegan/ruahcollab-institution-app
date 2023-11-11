@@ -11,6 +11,8 @@ import Logo from "./Logo";
 import Icon from "./Icon";
 import { faPlaceOfWorship, faLungs, faBuildingUser } from '@fortawesome/free-solid-svg-icons'
 import Button from './Button';
+import { BannerAd,BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-2420598559068720/7318847155';
 
 const link = 'https://rc.acaodoespirito.com.br';
 
@@ -88,6 +90,16 @@ const Header = ({navigation, searchAction=(search, filter)=>null, searchActive=f
 
   return (
     <>
+      <View style={{alignItems:'center'}}>
+        <BannerAd
+            unitId={adUnitId}
+            size={BannerAdSize.BANNER}
+            requestOptions={{
+              requestNonPersonalizedAdsOnly: false,
+            }}
+        />
+      </View>
+
       <View style={styles.header}>
         <TouchableHighlight underlayColor='#fafafa' 
               onPress={async () => await Linking.openURL(link)}>

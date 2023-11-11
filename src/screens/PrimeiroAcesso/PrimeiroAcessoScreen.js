@@ -1,6 +1,5 @@
 import {useState} from 'react';
 import {
-  View,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -10,6 +9,7 @@ import {
 import Button from '../../components/Button';
 import Logo from '../../components/Logo';
 import Label from '../../components/Label';
+import ErrorLabel from '../../components/ErrorLabel';
 import DeviceInfo from 'react-native-device-info';
 import CacheService from '../../service/Cache/CacheService';
 import {post} from '../../service/Rest/RestService';
@@ -25,38 +25,58 @@ const PrimeiroAcessoScreen = ({navigation}) => {
   const [site, setSite] = useState(null);
   const [endereco, setEndereco] = useState(null);
   const [zipcode, setZipcode] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  const renderError = () => {
+    if(errorMsg && errorMsg !== null)
+      return <ErrorLabel value={errorMsg} style={styles.lblError}/>
+    else
+      return <></>
+  }
 
   const handleSubmit = () => {
-    let deviceId = DeviceInfo.getDeviceId();
-    let uniqueId = DeviceInfo.getUniqueIdSync();
+    if(nome && nome != null
+            && email && email != null
+            && telefone && telefone != null
+            && resumo && resumo != null
+            && senha && senha != null
+            && endereco && endereco != null){
 
-    let device = {
-      id: deviceId,
-      uniqueId: uniqueId,
-    }
+      setErrorMsg(null);
 
-    let user = {
-      name: nome,
-      email: email,
-      phone: telefone,
-      site: site,
-      contactEmail: contactEmail,
-      contactPhone: telefone2,
-      resume: resumo,
-      zipcode: zipcode,
-      address: endereco
-    }
+      let deviceId = DeviceInfo.getDeviceId();
+      let uniqueId = DeviceInfo.getUniqueIdSync();
 
-    post('/auth/i/signup', {...user, password:senha, device:device}).then(response => {
-      if(response.status == 201){
-        handleSignin();
-      } else {
-        navigation.navigate('error');
+      let device = {
+        id: deviceId,
+        uniqueId: uniqueId,
       }
-    }).catch(err => {
-      console.log(err); 
-      navigation.navigate('error');
-    });
+
+      let user = {
+        name: nome,
+        email: email,
+        phone: telefone,
+        site: site,
+        contactEmail: contactEmail,
+        contactPhone: telefone2,
+        resume: resumo,
+        zipcode: zipcode,
+        address: endereco
+      }
+
+      post('/auth/i/signup', {...user, password:senha, device:device}).then(response => {
+        if(response.status == 201){
+          handleSignin();
+        } else {
+          navigation.navigate('error');
+        }
+      }).catch(err => {
+        console.log(err); 
+        navigation.navigate('error');
+      });
+    } else {
+      setErrorMsg('Preencha todos os campos obrigatórios (*) para continuar!');
+    }
   }
 
   const handleSignin = () => {
@@ -79,11 +99,11 @@ const PrimeiroAcessoScreen = ({navigation}) => {
         <Label value='Informe seus dados para cadastro:' style={styles.title}/>
 
         <TextInput style={styles.input} placeholderTextColor='#b57145'
-            placeholder='Nome da instituição'
+            placeholder='Nome da instituição*'
             value={nome} onChangeText={(val) => setNome(val)}/>
 
         <TextInput style={styles.input} placeholderTextColor='#b57145'
-            placeholder='Telefone pra contato (Ex.: 041995429288)'
+            placeholder='Telefone pra contato (Ex.: 041995429288)*'
             value={telefone} onChangeText={(val) => setTelefone(val)}/>
             
         <TextInput style={styles.input} placeholderTextColor='#b57145'
@@ -91,7 +111,7 @@ const PrimeiroAcessoScreen = ({navigation}) => {
             value={telefone2} onChangeText={(val) => setTelefone2(val)}/>
 
         <TextInput style={styles.input} placeholderTextColor='#b57145'
-            placeholder='Email para acessar o app'
+            placeholder='Email para acessar o app*'
             value={email} onChangeText={(val) => setEmail(val)}/>
 
         <TextInput style={styles.input} placeholderTextColor='#b57145'
@@ -99,24 +119,26 @@ const PrimeiroAcessoScreen = ({navigation}) => {
             value={contactEmail} onChangeText={(val) => setContactEmail(val)}/>
 
         <TextInput style={styles.input} placeholderTextColor='#b57145'
-            placeholder='Senha da instituição'
+            placeholder='Senha da instituição*'
             value={senha} onChangeText={(val) => setSenha(val)}/>
 
         <TextInput style={styles.txtArea} placeholderTextColor='#b57145'
-            placeholder='Informe o site (ou link da rede social) da instituição (opcional)'
+            placeholder={`Informe o site (ou link da rede social) \nda instituição (opcional)`}
             value={site} onChangeText={(val) => setSite(val)}/>
 
         <TextInput style={styles.txtArea} placeholderTextColor='#b57145'
-            placeholder='Nos conte sobre a instituição...'
+            placeholder='Nos conte sobre a instituição...*'
             value={resumo} onChangeText={(val) => setResumo(val)}/>
 
         <TextInput style={styles.txtArea} placeholderTextColor='#b57145'
-            placeholder='Informe o endereço da instituição'
+            placeholder='Informe o endereço da instituição*'
             value={endereco} onChangeText={(val) => setEndereco(val)}/>
 
-        <TextInput style={styles.txtArea} placeholderTextColor='#b57145'
+        <TextInput style={styles.input} placeholderTextColor='#b57145'
             placeholder='Informe o CEP da instituição (opcional)'
             value={zipcode} onChangeText={(val) => setZipcode(val)}/>
+
+        {renderError()}
 
         <Button label={'Pronto!'} onPress={() => handleSubmit()}/>
 
